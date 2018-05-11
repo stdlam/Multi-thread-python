@@ -150,57 +150,48 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
-        def minMaxHelper(gameState, deepness, agent):
+        def minMax(gameState, deepness, agent):
             
             if agent >= gameState.getNumAgents():
                 agent = 0
                 deepness += 1
-                
             if (deepness==self.depth or gameState.isWin() or gameState.isLose()):
                 return self.evaluationFunction(gameState)
             elif (agent == 0):
-                return maxFinder(gameState, deepness, agent)
+                return maxForPac(gameState, deepness, agent)
             else:
-                return minFinder(gameState, deepness, agent)
+                return minForGhost(gameState, deepness, agent)
         
-        def maxFinder(gameState, deepness, agent):
-            output = ["anyword", -float("inf")]
-            pacActions = gameState.getLegalActions(agent)
-            print 'gameState.getLegalActions(agent): ', gameState.getLegalActions(agent)
-                
-            for action in pacActions:
-                currState = gameState.generateSuccessor(agent, action)
-                #print 'currState: ', currState
-                currValue = minMaxHelper(currState, deepness, agent+1)
-                #print 'currValue: ', currValue
-                if type(currValue) is list:
-                    testVal = currValue[1]
+        def maxForPac(gameState, deepness, agent):
+            out=["des", -999999]
+            pac=gameState.getLegalActions(agent)
+            for ac in pac:
+                state=gameState.generateSuccessor(agent, ac)
+                value=minMax(state, deepness, agent+1)
+                if type(value) is list:
+                    temp=value[1]
                 else:
-                    testVal = currValue
-                if testVal > output[1]:
-                    output = [action, testVal]                    
-            return output
+                    temp=value
+                if temp>out[1]:
+                    out=[ac,temp]
+            return out
             
-        def minFinder(gameState, deepness, agent):
-            output = ["meow", float("inf")]
-            ghostActions = gameState.getLegalActions(agent)
-            
-            if not ghostActions:
-                return self.evaluationFunction(gameState)
-                
-            for action in ghostActions:
-                currState = gameState.generateSuccessor(agent, action)
-                currValue = minMaxHelper(currState, deepness, agent+1)
-                if type(currValue) is list:
-                    testVal = currValue[1]
+        def minForGhost(gameState, deepness, agent):
+            out=["des", 999999]
+            ghost=gameState.getLegalActions(agent)
+            for ac in ghost:
+                state=gameState.generateSuccessor(agent, ac)
+                value=minMax(state, deepness, agent+1)
+                if type(value) is list:
+                    temp=value[1]
                 else:
-                    testVal = currValue
-                if testVal < output[1]:
-                    output = [action, testVal]
-            return output
+                    temp=value
+                if temp<out[1]:
+                    out=[ac,temp]
+            return out
              
-        outputList = minMaxHelper(gameState, 0, 0)
-        return outputList[0]
+        output = minMax(gameState, 0, 0)
+        return output[0]
 
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
